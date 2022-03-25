@@ -20,11 +20,11 @@ void clearScreen() {
 	uint16_t data = 0 | (0x0c << 8);
 	for (i = 0; i < 80 * 25; i++) {
 		pos = i * 2;
-		asm volatile("movw %0, (%1)"::"r"(data),"r"(pos+0xb8000));
+		asm volatile("movw %0, (%1)"::"r"(data),"r"(pos+0xb8000)); // 0xb8000 is the vga memory area, like lab1 said.
 	}
 }
 
-void updateCursor(int row, int col){
+void updateCursor(int row, int col){  // I don't understand.
 	int cursorPos = row * 80 + col;
 	outByte(0x3d4, 0x0f);
 	outByte(0x3d5, (unsigned char)(cursorPos & 0xff));
@@ -46,7 +46,7 @@ void scrollScreen() {
 		data = displayMem[i+80];
 		asm volatile("movw %0, (%1)"::"r"(data),"r"(pos+0xb8000));
 	}
-	data = 0 | (0x0c << 8);
+	data = 0 | (0x0c << 8); //why ?
 	for (i = 80 * 24; i < 80 * 25; i++) {
 		pos = i * 2;
 		asm volatile("movw %0, (%1)"::"r"(data),"r"(pos+0xb8000));

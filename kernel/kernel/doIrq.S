@@ -47,7 +47,7 @@ irqGProtectFault:
 
 .global irqPageFault
 irqPageFault:
-	pushl $-1
+	pushl $-1   #push $-1 means it's a fault that can't restore ?
 	jmp asmDoIrq
 
 .global irqAlignCheck
@@ -64,7 +64,7 @@ irqSecException:
 irqKeyboard:
 	pushl $0
 	# TODO: 将irqKeyboard的中断向量号压入栈（手册里有说，注意看手册）
-
+	push $0x21
 	jmp asmDoIrq
 
 .global irqSyscall

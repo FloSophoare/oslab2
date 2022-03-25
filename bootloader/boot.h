@@ -7,13 +7,13 @@ struct ELFHeader {
 	unsigned short type;
 	unsigned short machine;
 	unsigned int   version;
-	unsigned int   entry;
-	unsigned int   phoff;
+	unsigned int   entry;  //entry point address
+	unsigned int   phoff;  // start of program header
 	unsigned int   shoff;
 	unsigned int   flags;
 	unsigned short ehsize;
 	unsigned short phentsize;
-	unsigned short phnum;
+	unsigned short phnum; //number of program header
 	unsigned short shentsize;
 	unsigned short shnum;
 	unsigned short shstrndx;

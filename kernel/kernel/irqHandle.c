@@ -30,9 +30,12 @@ void irqHandle(struct TrapFrame *tf) { // pointer tf = esp
 	asm volatile("movw %%ax, %%ds"::"a"(KSEL(SEG_KDATA)));
 
 	switch(tf->irq) {
-		// TODO: 填好中断处理程序的调用
-
-
+		// TODO: 填好中断处理程序的调用 
+		// Is it OK?
+		case -1: break;
+		case 0xd: GProtectFaultHandle(tf); break;
+		case 0x21: KeyboardHandle(tf); break;
+		case 0x80: syscallHandle(tf); break;
 
 		default:assert(0);
 	}
@@ -142,7 +145,7 @@ void syscallPrint(struct TrapFrame *tf) {
 			}
 
 		}
-		else{
+		else{ // charcater is '\n'
 			displayCol=0;
 			displayRow++;
 			if(displayRow==25){
@@ -176,7 +179,8 @@ void syscallGetChar(struct TrapFrame *tf){
 	keyBuffer[bufferHead+1]=0;
 	char c=0;
 	
-	while(c == 0){
+	while(c == 0){ // what is this doing? I can't understand.  
+							//Oh Yeah, I understand  that it may execute concurrently with keyboardHandle()
 		enableInterrupt();
 		c = keyBuffer[bufferHead];
 		putChar(c);
@@ -202,8 +206,7 @@ void syscallGetStr(struct TrapFrame *tf){
 	int i=0;
 
 	char tpc=0;
-	while(tpc!='\n' && i<size){
-
+	while(tpc!='\n' && i<size){ //  Is this parallel with  keyboardHandle?
 		while(keyBuffer[i]==0){
 			enableInterrupt();
 		}
@@ -215,10 +218,10 @@ void syscallGetStr(struct TrapFrame *tf){
 	int selector=USEL(SEG_UDATA);
 	asm volatile("movw %0, %%es"::"m"(selector));
 	int k=0;
-	for(int p=bufferHead;p<i-1;p++){
+	for(int p=bufferHead;p<i-1;p++){ //to copy keybuffer to str
 		asm volatile("movb %0, %%es:(%1)"::"r"(keyBuffer[p]),"r"(str+k));
 		k++;
 	}
-	asm volatile("movb $0x00, %%es:(%0)"::"r"(str+i));
+	asm volatile("movb $0x00, %%es:(%0)"::"r"(str+i)); // set the end of str
 	return;
 }

@@ -5,6 +5,6 @@ void initSerial(void);
 void putChar(char);
 void putStr(char *);
 void  putNum(int num);
-#define SERIAL_PORT  0x3F8
+#define SERIAL_PORT  0x3F8  //what is serial port for ?
 
 #endif

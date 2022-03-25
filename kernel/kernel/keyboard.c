@@ -2,6 +2,7 @@
 #include "device.h"
 
 /* Press Scan Code */
+//Why are these csan code different from what I learnt in DLAO lab? Is it cuz of using different keyboards?
 #define KESC_P 0x01 // escape
 #define K1_P 0x02
 #define K2_P 0x03
@@ -92,7 +93,7 @@
 
 #define KEYTABLE_SIZE (KF12_P+1)
 
-uint32_t keyBuffer[MAX_KEYBUFFER_SIZE];
+uint32_t keyBuffer[MAX_KEYBUFFER_SIZE]; //defined in keyboard.h and it's 256
 int bufferHead;
 int bufferTail;
 
@@ -110,7 +111,7 @@ void initKeyTable() {
 	keyboardState = 0; // 0: normal state; 1: capslock pressed; 2: capslock pressed again;
 	keyTable = keyTableL;
 
-	for (i = 0; i < KEYTABLE_SIZE; i++) {
+	for (i = 0; i < KEYTABLE_SIZE; i++) { //why is it  doing this even though it will do the below?
 		keyTableL[i] = 0;
 		keyTableU[i] = 0;
 	}
@@ -176,7 +177,7 @@ static inline void switchKeyboard() {
 }
 
 uint32_t getKeyCode() {
-	uint32_t code = inByte(0x60);
+	uint32_t code = inByte(0x60); // It should  be the  memory area that scan code is mapped to.
 	uint32_t val = inByte(0x61);
 	outByte(0x61, val | 0x80);
 	outByte(0x61, val);

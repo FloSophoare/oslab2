@@ -8,11 +8,11 @@
 
 void bootMain(void) {
 	int i = 0;
-	int phoff = 0x34;
-	int offset = 0x1000;
+	int phoff = 0x34; //why 0x34?
+	int offset = 0x1000; //why 0x1000?
 	unsigned int elf = 0x100000;
 	void (*kMainEntry)(void);
-	kMainEntry = (void(*)(void))0x100000;
+	kMainEntry = (void(*)(void))0x100000; // This is a function at 0x100000, so  maybe I need to load a function to 0x100000
 
 	for (i = 0; i < 200; i++) {
 		readSect((void*)(elf + i*512), 1+i);

@@ -62,7 +62,8 @@ int32_t syscall(int num, uint32_t a1,uint32_t a2,
 
 char getChar(){ // 对应SYS_READ STD_IN
 	// TODO: 实现getChar函数，方式不限
-
+	//through buffer?
+	
 }
 
 void getStr(char *str, int size){ // 对应SYS_READ STD_STR
