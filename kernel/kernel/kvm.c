@@ -42,7 +42,7 @@ void enterUserSpace(uint32_t entry) {
 	 */
 	uint32_t EFLAGS = 0;
 	asm volatile("pushl %0":: "r" (USEL(SEG_UDATA))); // push ss
-	asm volatile("pushl %0":: "r" (0x2fffff)); 
+	asm volatile("pushl %0":: "r" (0x2fffff));  //what is this?
 	asm volatile("pushfl"); //push eflags, sti
 	asm volatile("popl %0":"=r" (EFLAGS));
 	asm volatile("pushl %0"::"r"(EFLAGS|0x200));

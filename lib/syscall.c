@@ -93,7 +93,42 @@ void printf(const char *format,...){
 		//count++;
 		//i++;
 		//TODO: 可以借助状态机（回忆数电），辅助的函数已经实现好了，注意阅读手册
-		
+		if (state==0){
+			if (format[i] != '%'){
+				buffer[count] = format[i];  // Shoulde compare count with MAX_BUFFER_SIZE or not ?
+				count++;
+				i++;
+			}
+			else{
+				state = 1;
+				i++;
+				index++; //?
+			}
+		}
+		else if (state==1){
+			if (format[i] == 'c'){
+				character = *((char*)(paraList + index * 4));
+				buffer[count] = character;
+				count++;
+			}
+			else if (format[i] == 'd'){
+				hexadecimal = *((uint32_t*)(paraList + index *4));
+				count = dec2Str(decimal, buffer, MAX_BUFFER_SIZE, count);
+			}
+			else if (format[i] == 'x'){
+				hexadecimal = *((uint32_t*)(paraList + index *4));
+				count = hex2Str(hexadecimal, buffer, MAX_BUFFER_SIZE, count);
+			}
+			else if (format[i] == 's'){
+				string = *((char**)(paraList + index * 4));
+				count = str2Str(string, buffer, MAX_BUFFER_SIZE, count);
+			}
+			else{
+				state = 0;
+			}
+			i++;
+		}
+		// else state == 2 but it doesn't exist in this lab.
 	}
 	if(count!=0)
 		syscall(SYS_WRITE, STD_OUT, (uint32_t)buffer, (uint32_t)count, 0, 0);
@@ -112,7 +147,7 @@ int dec2Str(int decimal, char *buffer, int size, int count) {
 			count=0;
 		}
 		temp=decimal/10;
-		number[i]=temp*10-decimal;
+		number[i]=temp*10-decimal; //why not decimal % 10?
 		decimal=temp;
 		i++;
 		while(decimal!=0){
