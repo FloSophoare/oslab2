@@ -63,12 +63,13 @@ int32_t syscall(int num, uint32_t a1,uint32_t a2,
 char getChar(){ // 对应SYS_READ STD_IN
 	// TODO: 实现getChar函数，方式不限
 	//through buffer?
-	
+	return syscall(1, 0, 0,0, 0, 0);  //what the parameters are depends on irqHandle.c and doIrq.S
+
 }
 
 void getStr(char *str, int size){ // 对应SYS_READ STD_STR
-	// TODO: 实现getStr函数，方式不限
-
+	// TODO: 实现getStr函数，方式不限	
+	syscall(1, 1, str, size, 0, 0);
 }
 
 int dec2Str(int decimal, char *buffer, int size, int count);

@@ -47,7 +47,8 @@ irqGProtectFault:
 
 .global irqPageFault
 irqPageFault:
-	pushl $-1   #push $-1 means it's a fault that can't restore ?
+	pushl $-1   #push $-1 means it's a fault that can't restore ?  
+			#The answer: push $-1 means we don't handle it in lab2, so in irqHandle the operation of switch(-1) is only break
 	jmp asmDoIrq
 
 .global irqAlignCheck

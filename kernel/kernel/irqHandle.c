@@ -34,7 +34,7 @@ void irqHandle(struct TrapFrame *tf) { // pointer tf = esp
 		// Is it OK?
 		case -1: break;
 		case 0xd: GProtectFaultHandle(tf); break;
-		case 0x21: KeyboardHandle(tf); break;
+		//case 0x21: KeyboardHandle(tf); break; // Should there be this function?
 		case 0x80: syscallHandle(tf); break;
 
 		default:assert(0);
@@ -46,7 +46,7 @@ void GProtectFaultHandle(struct TrapFrame *tf){
 	return;
 }
 
-void KeyboardHandle(struct TrapFrame *tf){
+void KeyboardHandle(struct TrapFrame *tf){  //where and when is this function called? And is it exectued concurrently with sysGetChar?
 	uint32_t code = getKeyCode();
 
 	if(code == 0xe){ // 退格符
@@ -163,7 +163,7 @@ void syscallRead(struct TrapFrame *tf){
 	switch(tf->ecx){ //file descriptor
 		case 0:
 			syscallGetChar(tf);
-			break; // for STD_IN
+			break; // for STD_IN  // Yeah, it's for STD_IN, also in lab2/lib/syscall.c
 		case 1:
 			syscallGetStr(tf);
 			break; // for STD_STR
@@ -186,7 +186,7 @@ void syscallGetChar(struct TrapFrame *tf){
 		putChar(c);
 		disableInterrupt();
 	}
-	tf->eax=c;
+	tf->eax=c; //the result is stored in  eax.
 
 	char wait=0;
 	while(wait==0){

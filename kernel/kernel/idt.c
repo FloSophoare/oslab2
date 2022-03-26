@@ -46,6 +46,7 @@ static void setTrap(struct GateDescriptor *ptr, uint32_t selector, uint32_t offs
 }
 
 /* 声明函数，这些函数在汇编代码里定义 */
+// I have a question. How can I make sure they are the same ones in doIrq.S and below?
 void irqEmpty();
 void irqErrorCode();
 
