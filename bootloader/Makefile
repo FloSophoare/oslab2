@@ -18,9 +18,13 @@
 CC = gcc
 LD = ld
 #-fno-asynchronous-unwind-tables 
-CFLAGS = -m32 -march=i386 -static \
+#CFLAGS = -m32 -march=i386 -static \
 	 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer \
 	 -Wall -Werror -O2 -g
+CFLAGS = -m32 -march=i386 -static \
+	 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer \
+	 -Wall  -O2 -g
+
 ASFLAGS = -m32
 LDFLAGS = -m elf_i386
 

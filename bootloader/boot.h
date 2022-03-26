@@ -25,9 +25,9 @@ struct ProgramHeader {
 	unsigned int off;
 	unsigned int vaddr;
 	unsigned int paddr;
-	unsigned int filesz;
-	unsigned int memsz;
-	unsigned int flags;
+	unsigned int filesz; //this segment's size in the elf file
+	unsigned int memsz; //this segment's size in memory
+	unsigned int flags; // authority
 	unsigned int align;
 };
 
