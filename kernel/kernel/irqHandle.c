@@ -34,10 +34,10 @@ void irqHandle(struct TrapFrame *tf) { // pointer tf = esp
 		// Is it OK?
 		case -1: break;
 		case 0xd: GProtectFaultHandle(tf); break;
-		//case 0x21: KeyboardHandle(tf); break; // Should there be this function?
+		case 0x21: KeyboardHandle(tf); break; // Should there be this function?
 		case 0x80: syscallHandle(tf); break;
 
-		default:assert(0);
+		default:;
 	}
 }
 

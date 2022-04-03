@@ -1,12 +1,15 @@
 #include "x86.h"
 #include "device.h"
-#include"string.h"
+#include <string.h>
 
-SegDesc gdt[NR_SEGMENTS];       // the new GDT, NR_SEGMENTS=7, defined in x86/memory.h
+SegDesc gdt[NR_SEGMENTS];
 TSS tss;
 
-//init GDT and LDT
-void initSeg() { // setup kernel segements
+#define SECTSIZE 512
+
+
+
+void initSeg() {
 	gdt[SEG_KCODE] = SEG(STA_X | STA_R, 0,       0xffffffff, DPL_KERN);
 	gdt[SEG_KDATA] = SEG(STA_W,         0,       0xffffffff, DPL_KERN);
 	//gdt[SEG_UCODE] = SEG(STA_X | STA_R, 0,       0xffffffff, DPL_USER);
@@ -15,21 +18,18 @@ void initSeg() { // setup kernel segements
 	gdt[SEG_UDATA] = SEG(STA_W,         0x00200000,0x000fffff, DPL_USER);
 	gdt[SEG_TSS] = SEG16(STS_T32A,      &tss, sizeof(TSS)-1, DPL_KERN);
 	gdt[SEG_TSS].s = 0;
-	setGdt(gdt, sizeof(gdt)); // gdt is set in bootloader, here reset gdt in kernel
+	setGdt(gdt, sizeof(gdt));
 
 	/*
 	 * 初始化TSS
 	 */
-	tss.esp0 = 0x1fffff;
+	
 	tss.ss0 = KSEL(SEG_KDATA);
+	tss.esp0 = 0xf00000; 
+
 	asm volatile("ltr %%ax":: "a" (KSEL(SEG_TSS)));
 
 	/*设置正确的段寄存器*/
-	asm volatile("movw %%ax,%%ds":: "a" (KSEL(SEG_KDATA)));
-	//asm volatile("movw %%ax,%%es":: "a" (KSEL(SEG_KDATA)));
-	//asm volatile("movw %%ax,%%fs":: "a" (KSEL(SEG_KDATA)));
-	//asm volatile("movw %%ax,%%gs":: "a" (KSEL(SEG_KDATA)));
-	asm volatile("movw %%ax,%%ss":: "a" (KSEL(SEG_KDATA)));
 
 	lLdt(0);
 	
@@ -42,10 +42,10 @@ void enterUserSpace(uint32_t entry) {
 	 * and use 'iret' to jump to ring3
 	 */
 	int SectNum = 200;
-	int KernelSize = 512 * SectNum;
+	int KernelSize = SECTSIZE * SectNum;
 	unsigned char buf[KernelSize];
 	for(int i =0;i < SectNum;++i)
-		readSect(buf + i * 512, i+1+SectNum);
+		readSect(buf + i * SECTSIZE, i+1+SectNum);
 	struct ELFHeader *elf = (void *)buf;
 	struct ProgramHeader *ph = (void *)elf + elf->phoff;
 	for(int i = elf->phnum; i > 0; --i)
@@ -55,58 +55,18 @@ void enterUserSpace(uint32_t entry) {
 		ph = (void *)ph + elf->phentsize;
 	}
 	entry = (unsigned)elf->entry;
-	uint32_t EFLAGS = 0;
-	asm volatile("pushl %0":: "r" (USEL(SEG_UDATA))); // push ss
-	asm volatile("pushl %0":: "r" (0x2fffff));  //what is this?
-	asm volatile("pushfl"); //push eflags, sti
-	asm volatile("popl %0":"=r" (EFLAGS));
-	asm volatile("pushl %0"::"r"(EFLAGS|0x200));
-	asm volatile("pushl %0":: "r" (USEL(SEG_UCODE))); // push cs
-	asm volatile("pushl %0":: "r" (entry)); 
+	asm volatile("movw %%ax, %%es"::"a"(USEL(SEG_UDATA)));
+	asm volatile("movw %%ax, %%ds"::"a"(USEL(SEG_UDATA)));
+	asm volatile("pushw %0"::"i"(USEL(SEG_UDATA)));
+	asm volatile("pushl %0"::"i"(128<<10));
+	asm volatile("pushl %0"::"i"(0x2));
+	asm volatile("pushl %0"::"i"(USEL(SEG_UCODE)));
+	asm volatile("pushl %0"::"m"(entry));
 	asm volatile("iret");
 }
 
-/*
-kernel is loaded to location 0x100000, i.e., 1MB
-size of kernel is not greater than 200*512 bytes, i.e., 100KB
-user program is loaded to location 0x200000, i.e., 2MB
-size of user program is not greater than 200*512 bytes, i.e., 100KB
-*/
-
 void loadUMain(void) {
-	// TODO: 参照bootloader加载内核的方式，具体加载到哪里请结合手册提示思考！
-	
-	/*int i = 0;
-	int phoff = 0x34;
-	//int offset = 0x1000;
-	uint32_t elf = 0x200000;
-	uint32_t uMainEntry = 0;//read to 0x200000
 
-
-	for (i = 0; i < 200; i++) {
-		readSect((void*)(elf + i*512), 1+i);
-	}
-
-	// TODO: 填写kMainEntry、phoff、offset...... 然后加载Kernel（可以参考NEMU的某次lab）
-	ELFHeader* eh = (ELFHeader*) elf;  //This is wrong?
-	ProgramHeader*  ph = (ProgramHeader*)eh + phoff;
-
-	int phnum = eh->phnum;
-	for (int i = 0; i < phnum; i++){
-		if (ph->type == 0x1){
-			int paddr = ph->vaddr;
-			memcpy((void*)paddr, (void*)ph->off,  ph->filesz);
-			if (ph->memsz > ph->filesz){
-				memset((void*)paddr + ph->filesz, 0, ph->memsz - ph->filesz);
-			}
-		}
-		ph = ph + eh->phentsize;
-	}
-
-	uMainEntry = (uint32_t)eh->entry; //function pointer
-
-	*/
-
+	/*加载用户程序至内存*/
 	enterUserSpace(0x200000);
-	
 }
