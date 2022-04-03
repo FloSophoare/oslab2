@@ -1,5 +1,6 @@
 #include "x86.h"
 #include "device.h"
+#include"string.h"
 
 SegDesc gdt[NR_SEGMENTS];       // the new GDT, NR_SEGMENTS=7, defined in x86/memory.h
 TSS tss;
@@ -40,6 +41,20 @@ void enterUserSpace(uint32_t entry) {
 	 * you should set the right segment registers here
 	 * and use 'iret' to jump to ring3
 	 */
+	int SectNum = 200;
+	int KernelSize = 512 * SectNum;
+	unsigned char buf[KernelSize];
+	for(int i =0;i < SectNum;++i)
+		readSect(buf + i * 512, i+1+SectNum);
+	struct ELFHeader *elf = (void *)buf;
+	struct ProgramHeader *ph = (void *)elf + elf->phoff;
+	for(int i = elf->phnum; i > 0; --i)
+	{
+		memcpy((void *)ph->vaddr, buf + ph->off, ph->filesz);
+		memset((void *)ph->vaddr + ph->filesz, 0, ph->memsz - ph->filesz);
+		ph = (void *)ph + elf->phentsize;
+	}
+	entry = (unsigned)elf->entry;
 	uint32_t EFLAGS = 0;
 	asm volatile("pushl %0":: "r" (USEL(SEG_UDATA))); // push ss
 	asm volatile("pushl %0":: "r" (0x2fffff));  //what is this?
@@ -61,14 +76,37 @@ size of user program is not greater than 200*512 bytes, i.e., 100KB
 void loadUMain(void) {
 	// TODO: 参照bootloader加载内核的方式，具体加载到哪里请结合手册提示思考！
 	
-	int i = 0;
-	int phoff = 0x0;
-	int offset = 0x0;
-	uint32_t elf = 0x0;
+	/*int i = 0;
+	int phoff = 0x34;
+	//int offset = 0x1000;
+	uint32_t elf = 0x200000;
 	uint32_t uMainEntry = 0;//read to 0x200000
 
 
+	for (i = 0; i < 200; i++) {
+		readSect((void*)(elf + i*512), 1+i);
+	}
 
-	enterUserSpace(uMainEntry);
+	// TODO: 填写kMainEntry、phoff、offset...... 然后加载Kernel（可以参考NEMU的某次lab）
+	ELFHeader* eh = (ELFHeader*) elf;  //This is wrong?
+	ProgramHeader*  ph = (ProgramHeader*)eh + phoff;
+
+	int phnum = eh->phnum;
+	for (int i = 0; i < phnum; i++){
+		if (ph->type == 0x1){
+			int paddr = ph->vaddr;
+			memcpy((void*)paddr, (void*)ph->off,  ph->filesz);
+			if (ph->memsz > ph->filesz){
+				memset((void*)paddr + ph->filesz, 0, ph->memsz - ph->filesz);
+			}
+		}
+		ph = ph + eh->phentsize;
+	}
+
+	uMainEntry = (uint32_t)eh->entry; //function pointer
+
+	*/
+
+	enterUserSpace(0x200000);
 	
 }

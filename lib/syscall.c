@@ -69,7 +69,7 @@ char getChar(){ // 对应SYS_READ STD_IN
 
 void getStr(char *str, int size){ // 对应SYS_READ STD_STR
 	// TODO: 实现getStr函数，方式不限	
-	syscall(1, 1, str, size, 0, 0);
+	syscall(1, 1, (int)str, size, 0, 0);
 }
 
 int dec2Str(int decimal, char *buffer, int size, int count);
@@ -87,7 +87,7 @@ void printf(const char *format,...){
 	uint32_t hexadecimal=0;
 	char *string=0;
 	char character=0;
-	void* para=0;
+	//void* para=0;
 	while(format[i]!=0){
 		//buffer[count] = format[i];
 		//count++;

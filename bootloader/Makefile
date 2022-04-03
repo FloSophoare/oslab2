@@ -21,9 +21,13 @@ LD = ld
 #CFLAGS = -m32 -march=i386 -static \
 	 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer \
 	 -Wall -Werror -O2 -g
+#CFLAGS = -m32 -march=i386 -static \
+	 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer \
+	 -fno-asynchronous-unwind-tables \
+	 -Wall  -Os
 CFLAGS = -m32 -march=i386 -static \
 	 -fno-builtin -fno-stack-protector -fno-omit-frame-pointer \
-	 -Wall  -O2 -g
+	 -Wall -O2 -g
 
 ASFLAGS = -m32
 LDFLAGS = -m elf_i386
@@ -34,7 +38,8 @@ BOBJS = $(BSFILES:.S=.o) $(BCFILES:.c=.o)
 
 bootloader.bin: $(BOBJS)
 	$(LD) $(LDFLAGS) -e start -Ttext 0x7c00 -o bootloader.elf $(BOBJS)
-	objcopy -O binary bootloader.elf bootloader.bin
+	#objcopy -O binary bootloader.elf bootloader.bin
+	objcopy -S -j .text -O binary bootloader.elf bootloader.bin
 	@../utils/genBoot.pl bootloader.bin
 
 clean:

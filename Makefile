@@ -1,3 +1,5 @@
+.PHONY: os.img  //Add it?
+
 QEMU = qemu-system-i386
 
 os.img:
