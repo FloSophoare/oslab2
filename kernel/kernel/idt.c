@@ -17,13 +17,14 @@ static void setIntr(struct GateDescriptor *ptr, uint32_t selector, uint32_t offs
 		结构体声明在某个文件里
 	*/
 	ptr->offset_15_0 = offset & 0xffff;
-	ptr->segment = selector & 0xffff;
+	//ptr->segment = selector & 0xffff;
+	ptr->segment = selector << 3;
 	ptr->pad0 = 0;
 	ptr->type = 0xe; //type is 1110B
 	ptr->system = 0; //what is this? It is always 0.
-	ptr->privilege_level = 0; // DPL = 0
+	ptr->privilege_level = dpl; // DPL = 0
 	ptr->present = 1; //linux always set present 1, and this is introduced in ICS page 342.
-	ptr->offset_31_16 = offset >> 16;
+	ptr->offset_31_16 = (offset >> 16) & 0xffff;
 
 }
 
@@ -33,14 +34,13 @@ static void setTrap(struct GateDescriptor *ptr, uint32_t selector, uint32_t offs
 		要求同上
 	*/
 	ptr->offset_15_0 = offset & 0xffff;
-	ptr->segment = selector & 0xffff;
+	ptr->segment = selector << 3;
 	ptr->pad0 = 0;
 	ptr->type = 0xf; //type is 1111B
 	ptr->system = 0; //what is this? It is always 0.
-	ptr->privilege_level = 0; // DPL = 0
+	ptr->privilege_level = dpl; // DPL = 0
 	ptr->present = 1; //linux always set present 1, and this is introduced in ICS page 342.
-	ptr->offset_31_16 = offset >> 16;
-
+	ptr->offset_31_16 = (offset >> 16) & 0xffff;
 
 
 }
