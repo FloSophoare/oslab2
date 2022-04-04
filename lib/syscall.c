@@ -146,6 +146,7 @@ void printf(const char *format,...){
 	}
 	if(count!=0)
 		syscall(SYS_WRITE, STD_OUT, (uint32_t)buffer, (uint32_t)count, 0, 0);
+	va_end(arg);
 }
 
 int dec2Str(int decimal, char *buffer, int size, int count) {

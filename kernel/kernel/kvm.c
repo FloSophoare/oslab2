@@ -66,8 +66,8 @@ size of user program is not greater than 200*512 bytes, i.e., 100KB
 void loadUMain(void) {
 	// TODO: 参照bootloader加载内核的方式，具体加载到哪里请结合手册提示思考！
 	putStr("Hello, this is the first line in loadUMain\n");
-	/*int i = 0;
-	int phoff = 0x34;
+	int i = 0;
+	//int phoff = 0x34;
 	//int offset = 0x1000;
 	uint32_t elf = 0x300000;
 	uint32_t uMainEntry = 0;//read to 0x200000
@@ -79,23 +79,20 @@ void loadUMain(void) {
 	putStr("Hello, this is the line after the for:readSect\n");
 
 	// TODO: 填写kMainEntry、phoff、offset...... 然后加载Kernel（可以参考NEMU的某次lab）
-	ELFHeader* eh = (ELFHeader*) elf;  //This is wrong?
-	phoff = eh->phoff;
-	ProgramHeader*  ph = (ProgramHeader*)eh + phoff;
-
-	int phnum = eh->phnum;
-	for (int i = 0; i < phnum; i++){
-		if (ph->type == 0x1){
-			for (int j = 0; j < ph->filesz; j++){
-				*(char*) (ph->paddr + j) = *(char*)(elf + ph->off + j);
-			}
+	ELFHeader *eh = (void *)elf;
+	ProgramHeader *ph = (void *)elf + eh->phoff;
+	for(int i = 0; i < eh->phnum; i++)
+	{
+		memcpy((void *)ph->paddr + 0x200000, (void*)elf + ph->off, ph->filesz);
+		if (ph->memsz > ph->filesz){
+			memset((void *)ph->paddr + 0x200000 + ph->filesz, 0, ph->memsz - ph->filesz);
 		}
-		ph = ph + eh->phentsize;
+		ph = (void *)ph + eh->phentsize;
 	}
+	uMainEntry = (unsigned)eh->entry;
 	putStr("Hello, this is the line after for:load and before enterUserSpace\n");
-
-	uMainEntry = (uint32_t)eh->entry; //function pointer
-	enterUserSpace(uMainEntry);*/
+	enterUserSpace(uMainEntry);
+	
 
 
 
@@ -123,7 +120,7 @@ void loadUMain(void) {
 	
 	
 	 // mycode 2
-	int i = 0;
+	/*int i = 0;
 	int phoff = 0x34;
 	unsigned int elf = 0x300000;
 	uint32_t uMainEntry = 0;
@@ -146,7 +143,7 @@ void loadUMain(void) {
 	}
 	uMainEntry = (uint32_t) eh->entry;
 	putStr("Hello, this is the line after for:load and before enterUserSpace\n");
-	enterUserSpace(uMainEntry);
+	enterUserSpace(uMainEntry);*/
 /*
 	int i = 0;
 	int phoff = 0x34; // program header offset
