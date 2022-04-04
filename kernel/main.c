@@ -22,6 +22,7 @@ void kEntry(void) {
 	
 	// initialize keyboard device
 	initKeyTable();
+	
 	putStr("Hello, this is bofore loadUMain\n");
 	loadUMain(); // load user program, enter user space
 	putStr("Hello, this is after loadUMain\n");

@@ -82,9 +82,11 @@ void loadUMain(void) {
 	ProgramHeader *ph = (void *)elf + eh->phoff;
 	for(int i = 0; i < eh->phnum; i++)
 	{
-		memcpy((void *)ph->paddr + 0x200000, (void*)elf + ph->off, ph->filesz);
-		if (ph->memsz > ph->filesz){
-			memset((void *)ph->paddr + 0x200000 + ph->filesz, 0, ph->memsz - ph->filesz);
+		if (ph->type == 0x1){
+			memcpy((void *)ph->paddr + 0x200000, (void*)elf + ph->off, ph->filesz);
+			if (ph->memsz > ph->filesz){
+				memset((void *)ph->paddr + 0x200000 + ph->filesz, 0, ph->memsz - ph->filesz);
+			}
 		}
 		ph = (void *)ph + eh->phentsize;
 	}

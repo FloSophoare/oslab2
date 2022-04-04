@@ -18,9 +18,11 @@ void bootMain(void) {
 	ProgramHeader *ph = (void *)elf + elf->phoff;
 	for(int i = 0; i < elf->phnum; i++)
 	{
-		memcpy((void *)ph->vaddr, buf + ph->off, ph->filesz);
-		if (ph->memsz > ph->filesz){
-			memset((void *)ph->vaddr + ph->filesz, 0, ph->memsz - ph->filesz);
+		if (ph->type == 0x1){
+			memcpy((void *)ph->vaddr, buf + ph->off, ph->filesz);
+			if (ph->memsz > ph->filesz){
+				memset((void *)ph->vaddr + ph->filesz, 0, ph->memsz - ph->filesz);
+			}
 		}
 		ph = (void *)ph + elf->phentsize;
 	}
