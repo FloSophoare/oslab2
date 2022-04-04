@@ -74,16 +74,16 @@ void initIdt() {
 	
 	/* Exceptions with error code */
 	// TODO: 填好剩下的表项，参考上面那个，是不是就会了？// It sholud be the next one not pre one, it is iraSyscall
-	setTrap(idt + 0x8, SEG_KCODE,(uint32_t)irqDoubleFault, DPL_USER);
-	setTrap(idt + 0xa, SEG_KCODE,(uint32_t)irqInvalidTSS, DPL_USER);
-	setTrap(idt + 0xb, SEG_KCODE,(uint32_t)irqSegNotPresent, DPL_USER);
-	setTrap(idt + 0xc, SEG_KCODE,(uint32_t)irqStackSegFault, DPL_USER);
-	setTrap(idt + 0xd, SEG_KCODE,(uint32_t)irqGProtectFault, DPL_USER);
-	setTrap(idt + 0xe, SEG_KCODE,(uint32_t)irqPageFault, DPL_USER);
-	setTrap(idt + 0x11, SEG_KCODE,(uint32_t)irqAlignCheck, DPL_USER);
-	setTrap(idt + 0x1e, SEG_KCODE,(uint32_t)irqSecException, DPL_USER);
+	setTrap(idt + 0x8, SEG_KCODE,(uint32_t)irqDoubleFault, DPL_KERN);
+	setTrap(idt + 0xa, SEG_KCODE,(uint32_t)irqInvalidTSS, DPL_KERN);
+	setTrap(idt + 0xb, SEG_KCODE,(uint32_t)irqSegNotPresent, DPL_KERN);
+	setTrap(idt + 0xc, SEG_KCODE,(uint32_t)irqStackSegFault, DPL_KERN);
+	setTrap(idt + 0xd, SEG_KCODE,(uint32_t)irqGProtectFault, DPL_KERN);
+	setTrap(idt + 0xe, SEG_KCODE,(uint32_t)irqPageFault, DPL_KERN);
+	setTrap(idt + 0x11, SEG_KCODE,(uint32_t)irqAlignCheck, DPL_KERN);
+	setTrap(idt + 0x1e, SEG_KCODE,(uint32_t)irqSecException, DPL_KERN);
 
-	setIntr(idt + 0x21, SEG_KCODE,(uint32_t)irqKeyboard, DPL_USER);
+	setIntr(idt + 0x21, SEG_KCODE,(uint32_t)irqKeyboard, DPL_KERN);
 
 	/* Exceptions with DPL = 3 */
 	// TODO: 填好剩下的表项，哪个dpl是3，手册里都说了，别看往年代码，都是错的，小心被抓 ：）

@@ -1,6 +1,6 @@
 #include "lib.h"
 #include "types.h"
-
+#include"stdarg.h"
 
 
 /*
@@ -62,14 +62,14 @@ int32_t syscall(int num, uint32_t a1,uint32_t a2,
 
 char getChar(){ // 对应SYS_READ STD_IN
 	// TODO: 实现getChar函数，方式不限
-	//through buffer?
+	//through buffer? No
 	return syscall(1, 0, 0,0, 0, 0);  //what the parameters are depends on irqHandle.c and doIrq.S
 
 }
 
 void getStr(char *str, int size){ // 对应SYS_READ STD_STR
 	// TODO: 实现getStr函数，方式不限	
-	syscall(1, 1, (int)str, size, 0, 0);
+	syscall(1, 1, (uint32_t)str, size, 0, 0);
 }
 
 int dec2Str(int decimal, char *buffer, int size, int count);
@@ -81,14 +81,16 @@ void printf(const char *format,...){
 	char buffer[MAX_BUFFER_SIZE];
 	int count=0; // buffer index
 	int index=0; // parameter index
-	void *paraList=(void*)&format; // address of format in stack
+	//void *paraList=(void*)&format; // address of format in stack
 	int state=0; // 0: legal character; 1: '%'; 2: illegal format
 	int decimal=0;
 	uint32_t hexadecimal=0;
 	char *string=0;
 	char character=0;
 	//void* para=0;
-	while(format[i]!=0){
+	va_list arg;
+	va_start(arg, format);
+	while(format[i] != '\0'){
 		//buffer[count] = format[i];
 		//count++;
 		//i++;
@@ -107,26 +109,38 @@ void printf(const char *format,...){
 		}
 		else if (state==1){
 			if (format[i] == 'c'){
-				character = *((char*)(paraList + index * 4));
+				//character = *((char*)(paraList + index * 4));
+				character = va_arg(arg, int);
 				buffer[count] = character;
 				count++;
+				state = 0;
+				i++;
 			}
 			else if (format[i] == 'd'){
-				hexadecimal = *((uint32_t*)(paraList + index *4));
+				//hexadecimal = *((uint32_t*)(paraList + index *4));
+				decimal = va_arg(arg, int);
 				count = dec2Str(decimal, buffer, MAX_BUFFER_SIZE, count);
+				state = 0;
+				i++;
 			}
 			else if (format[i] == 'x'){
-				hexadecimal = *((uint32_t*)(paraList + index *4));
+				//hexadecimal = *((uint32_t*)(paraList + index *4));
+				hexadecimal = va_arg(arg, uint32_t);
 				count = hex2Str(hexadecimal, buffer, MAX_BUFFER_SIZE, count);
+				state = 0;
+				i++;
 			}
 			else if (format[i] == 's'){
-				string = *((char**)(paraList + index * 4));
+				//string = *((char**)(paraList + index * 4));
+				string = va_arg(arg, char*);
 				count = str2Str(string, buffer, MAX_BUFFER_SIZE, count);
+				state = 0;
+				i++;
 			}
 			else{
 				state = 0;
+				i++;
 			}
-			i++;
 		}
 		// else state == 2 but it doesn't exist in this lab.
 	}

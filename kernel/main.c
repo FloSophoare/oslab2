@@ -9,6 +9,7 @@ void kEntry(void) {
 	// TODO: 做一系列初始化
 	// initialize idt
 	initIdt();
+	
 
 	// iniialize 8259a
 	initIntr();
@@ -21,9 +22,9 @@ void kEntry(void) {
 	
 	// initialize keyboard device
 	initKeyTable();
-
+	putStr("Hello, this is bofore loadUMain\n");
 	loadUMain(); // load user program, enter user space
-
+	putStr("Hello, this is after loadUMain\n");
 	while(1);
 	assert(0);
 }

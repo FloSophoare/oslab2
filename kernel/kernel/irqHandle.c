@@ -37,11 +37,12 @@ void irqHandle(struct TrapFrame *tf) { // pointer tf = esp
 		case 0x21: KeyboardHandle(tf); break; // Should there be this function?
 		case 0x80: syscallHandle(tf); break;
 
-		default:;
+		default: ;
 	}
 }
 
 void GProtectFaultHandle(struct TrapFrame *tf){
+	//putStr("Hello, is this GP executing?\n");
 	assert(0);
 	return;
 }
