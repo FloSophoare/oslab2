@@ -37,7 +37,7 @@ void irqHandle(struct TrapFrame *tf) { // pointer tf = esp
 		case 0x21: KeyboardHandle(tf); break; // Should there be this function?
 		case 0x80: syscallHandle(tf); break;
 
-		default: ;
+		default: ;  //why it's OK when removed this assert(0) but wrong when retained?
 	}
 }
 
